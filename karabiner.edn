@@ -1,0 +1,923 @@
+{
+    ;; tutorial: https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md
+
+    ;; :!Ca is keycode :a and prefix a with !C
+
+    ;; C  | left_command
+    ;; T  | left_control
+    ;; O  | left_option
+    ;; S  | left_shift
+    ;; F  | fn
+    ;; Q  | right_command
+    ;; W  | right_control
+    ;; E  | right_option
+    ;; R  | right_shift
+    ;; P  | caps_lock
+    ;; !! | command + control + optional + shift (hyper)
+
+    ;; code for all this:
+    ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/b9b334a187379f9bc8182ad59e2cca2a1789e9c0/src/karabiner_configurator/keys.clj#L68
+
+    ;; FROM modifiers
+    ;; to understand better how modifiers work in karabiner
+    ;; karabiner definition of mandatory and optional
+    ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/modifiers/
+
+    ;;    | no modifier
+    ;;                  input key maps to output key exactly
+    ;;                  adding any modifier will cancel the event
+
+    ;; !  | mandatory
+    ;;                  specified modifier is removed in output (to event)
+    ;;                  specified modifiers must be present for event to occur
+    ;;                  adding any other modifier will cancel the event
+
+    ;; #  | optional (single)
+    ;;                  specified modifier is kept in output (to event)
+    ;;                  one (or none) of the specified modifiers must be present
+    ;;                  adding any other modifier will cancel the event
+
+    ;; ## | optional any
+    ;;                  specified modifier is removed in output (to event)
+    ;;                  specified modifiers *must* be present for event to occur
+    ;;                  adding any other modifier will add to output event
+    ;;                  (what you typically expect, additional modifiers tacked on)
+    ;;
+    ;; need to prefix C T O S F with ! or #
+    ;;
+
+
+:profiles {
+    :Default {
+        :default true
+
+        :sim     25     ;; simultaneous_threshold_milliseconds (def: 50)
+                        ;; if keydown event for two different keys are pressed within :sim ms, the keypresses are considered simultaneous
+        :alone   350    ;; to_if_alone_timeout_milliseconds (def: 1000)
+                        ;; if keyup event comes within :alone ms from keydown, the key is not just pressed but held
+        :delay   350    ;; to_delayed_action_delay_milliseconds (def: 500)
+                        ;; after :delay ms, the key press is considered to be delayed (used for double-press macros)
+        :held    25    ;; to_if_held_down_threshold_milliseconds (def: 500)
+                        ;; key is fired twice when :held ms is elapsed (otherwise seen as a hold command) (TODO WHAT IS THIS??)
+    }
+} ;; profiles
+
+; the default value is 250
+:simlayer-threshold 200 ; this affects the max time between keypresses that a simlayer will be activated
+; if you set this too quickly, it will be hard to use if you press the layer switch key then think about what
+; you're wanting to press.
+
+:templates {
+    :open "osascript -e 'tell application \"%s\" to activate'"
+} ;; templates
+
+;; Define different input sources for conditions per keyboard layout being used
+:input-sources {
+    :abc {
+        :input_source_id "com.apple.keylayout.ABC"
+        :language "en"
+        }
+    :colemakdh {
+        :input_source_id "io.github.colemakmods.keyboardlayout.colemakdh.colemakdhiso-extended"
+        :language "en"
+        }
+    :colemakdhmatrix {
+        :input_source_id "io.github.colemakmods.keyboardlayout.colemakdh.colemakdhmatrix-extended"
+        :language "en"
+        }
+    :us-layout {
+        :input_source_id "com.apple.keylayout.US"
+        :language "en"
+        }
+} ;; input-sources
+
+;; Define different kinds of keyboards
+:devices {
+    :apple [
+            {:vendor_id 1452}
+            {:vendor_id 76}
+    ]
+    :leeloo [{:vendor_id 16403, :product_id 8226 }] ;; Clickety Split Leeloo v1.13 (mechanical split keyboard)
+    :ap2 [{:vendor_id 1241, :product_id 41618 }] ;; Anne Pro 2 (mechanical)
+    :msft [{:vendor_id 1118, :product_id 1957 }] ;; Microsoft Keyboard [Ergonomic Sculpt]
+    :tada68 [{:vendor_id 65261, :product_id 4611 }] ;; Tada68 (mechanical)
+    :kinesis [{:vendor_id 10730 }] ;; Kinesis Advantage 2 keyboard
+    :g915   [{:vendor_id 1133}] ;; Logitech G915 keyboard
+
+    :kybs [  ;; Default for all keyboards
+        {:vendor_id 1452}
+        {:vendor_id 76}
+        {:vendor_id 1241, :product_id 41618 }
+        {:vendor_id 1118, :product_id 1957 }
+        {:vendor_id 65261, :product_id 4611 }
+        {:vendor_id 10730}
+        {:vendor_id 1133, :product_id 50501 }
+        {:vendor_id 16403, :product_id 8226 }
+    ]
+
+    :kybs-kinesis [  ;; All keyboards (except Kinesis)
+        {:vendor_id 1452}
+        {:vendor_id 76}
+        {:vendor_id 1241, :product_id 41618 }
+        {:vendor_id 1118, :product_id 1957 }
+        {:vendor_id 65261, :product_id 4611 }
+        {:vendor_id 1133, :product_id 50501 }
+        {:vendor_id 16403, :product_id 8226 }
+    ]
+
+} ;; devices
+
+;; layers are basically "hyper" keys
+;; press this in combination with something else and depending on your rule, make things happen
+:layers{
+
+}
+
+;; simlayers are basically "hyper" keys
+;; layers works too, but only recommended for non-typing keys like . or tab
+;; to use more regular typing keys, use simlayers
+:simlayers {
+    :a-mode {:key :a}
+    :period-mode {:key :period}
+    :r-mode {:key :r}
+    :one-shot-shift-mode {:key :left_shift}
+    :spacebar-mode {:key :spacebar }
+    ;; :tab-mode {:key :caps_lock}
+    :apps {:key :q}
+    :p-held {:key :p}
+} ;; simlayers
+
+:applications {
+    :terminals  [ "^com\\.apple\\.Terminal$",
+        "^com\\.googlecode\\.iterm2$"]
+    ;; :safari [ "^com.apple.Safari$" ]
+    :vscode [ "^com.microsoft.VSCode$" ]
+    ;; :opera [ "^com.operasoftware.Opera$" ]
+    ;; :chrome [ "^com.google.Chrome$" ]
+    ;; :emacs [ "^org.gnu.Emacs$" ]
+    ;; :drafts [ "^com.agiletortoise.Drafts-OSX$" ]
+    ;; :firefox [ "^org.mozilla.firefox$" ]
+}
+
+:froms {
+        :any_key {:any :key_code}
+        :any_consumer {:any :consumer_key_code }
+        :any_button {:any :pointing_button}
+
+        ;alias
+        :delete {:key :delete_or_backspace}
+        :return {:key :return_or_enter}
+        :btick {:key :b}
+        :tilde {:key :b}
+        :bslash {:key :backslash}
+        :ls {:key :left_shift}
+        :rs {:key :right_shift}
+
+        ;colemak froms (for easier mnemonics)
+        :-q {:key :q}
+        :-w {:key :w}
+        :-f {:key :e}
+        :-p {:key :r}
+        :-b {:key :t}
+        :-j {:key :y}
+        :-l {:key :u}
+        :-u {:key :i}
+        :-y {:key :o}
+        :-semicolon {:key :p}
+
+        :-a {:key :a}
+        :-r {:key :s}
+        :-s {:key :d}
+        :-t {:key :f}
+        :-g {:key :g}
+        :-m {:key :h}
+        :-n {:key :j}
+        :-e {:key :k}
+        :-i {:key :l}
+        :-o {:key :semicolon}
+
+        :-z {:key :grave_accent_and_tilde}
+        :-x {:key :z}
+        :-c {:key :x}
+        :-d {:key :c}
+        :-v {:key :v}
+        :-k {:key :n}
+        :-h {:key :m}
+    }
+
+:tos {
+        ;colemak tos (for easier string sending)
+        :any_key {:any :key_code}
+        :-q {:key :q}
+        :-w {:key :w}
+        :-f {:key :e}
+        :-p {:key :r}
+        :-b {:key :t}
+        :-j {:key :y}
+        :-l {:key :u}
+        :-u {:key :i}
+        :-y {:key :o}
+        :-semicolon {:key :p}
+
+        :-a {:key :a}
+        :-r {:key :s}
+        :-s {:key :d}
+        :-t {:key :f}
+        :-g {:key :g}
+        :-m {:key :h}
+        :-n {:key :j}
+        :-e {:key :k}
+        :-i {:key :l}
+        :-o {:key :semicolon}
+
+        :-z {:key :grave_accent_and_tilde}
+        :-x {:key :z}
+        :-c {:key :x}
+        :-d {:key :c}
+        :-v {:key :v}
+        :-k {:key :n}
+        :-h {:key :m}
+
+        ;named symbols
+        :exclaim {:key :1 :modi :shift}
+        :at {:key :2 :modi :shift}
+        :hash {:key :3 :modi :shift}
+        :dollar {:key :4 :modi :shift}
+        :percent {:key :5 :modi :shift}
+        :caret {:key :6 :modi :shift}
+        :ampersand {:key :7 :modi :shift}
+        :bullet {:key :8 :modi :shift}
+        :open_paren {:key :9 :modi :shift}
+        :close_paren {:key :0 :modi :shift}
+        :hyphen {:key :hyphen}
+        :underscore {:key :hyphen :modi :shift}
+        :equal {:key :equal_sign}
+        :plus {:key :equal_sign :modi :shift}
+        :semicolon {:key :semicolon}
+        :colon {:key :semicolon :modi :shift}
+        :open_bracket {:key :open_bracket}
+        :close_bracket {:key :close_bracket}
+        :open_brace {:key :open_bracket :modi :shift}
+        :close_brace {:key :close_bracket :modi :shift}
+        :less_than {:key :comma :modi :shift}
+        :greater_than {:key :period :modi :shift}
+        :backquote {:key :grave_accent_and_tilde}
+        :tilde {:key :grave_accent_and_tilde :modi :shift}
+        :dquote {:key :quote :modi :shift}
+        :pipe {:key :backslash :modi :shift}
+        :question {:key :slash :modi :shift}
+        :ls {:key :left_shift}
+        :rs {:key :right_shift}
+
+        ; system-wide shortcuts
+        :command_tab {:key :!Ctab}
+        :left_desktop {:key :!!left_arrow}
+        :right_desktop {:key :!!right_arrow}
+        :mission_control {:key :!!up_arrow}
+        :internet_query {:key :!!t}
+        :show_application_windows {:key :!!down_arrow}
+        :show_desktop {:key :f12}
+        :activate_spotlight {:key :!!spacebar}
+        :fullscreen_snapshot {:key :!CS3}
+        :window_snapshot {:key :!CS4}
+        :selection_snapshot {:key :!CS5}
+        :emoji_picker {:key :spacebar :modi [:control :command]} ;!CTspacebar
+        ;; :system-new_tab {:key :!Ct}
+        ;; :system-close_tab {:key :!Cw}
+        ;; :system-force_quit_apps {:key :!COescape}
+    }
+
+;; main contains multiple manipulators
+:main [
+
+
+    ;; each manipulator has a description and multiple rules
+
+    ;;{:des "..."                               ;; -> description
+    ;; :rules[
+    ;;          [<from>  <to>  <conditions>]    ;; -> rule 1
+    ;;          [<from>  <to>  <conditions>]    ;; -> rule 2
+    ;; ]}
+
+    ;; rule [:period ["period-mode" 1] nil {:afterup ["period-mode" 0] :alone :period}]
+    ;;       |_____| |_______________| |_| |_________________________________________|
+    ;;        <from>    <to>      <conditions>         <other options>
+    ;;
+    ;; karabiner docs: ;; https://pqrs.org/osx/karabiner/json.html#complex_modifications-manipulator-definition
+    ;; <other options> includs ~to_if_alone~, ~to_if_held_down~,~to_after_key_up~, ~to_delayed_action~ and ~parameters~.
+    ;;
+
+    ;; (custom variables) & modifiers -> Advanced
+    ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#custom-variable
+
+    {:des "leeloo specific mappings"
+    :rules [:leeloo
+        [:left_control :left_command]
+        [:left_command :left_control]
+    ;;  [:right_option :right_control]
+    ]}
+
+    {:des   "Quit application by pressing command-q twice"
+        :rules [[
+            ;; <from> second cmd-q (when variable "command-q" is 1)
+            :!C#Pq
+            ;; <to>, 3 to action
+            ;; 1. call cmd-q
+            ;; 2. set variable "command-q" to 0
+            ;; 3. cleanup the :cmdq notification (omit the thrid item to cleanup notification)
+            [:!Cq ["command-q" 0] [:noti :cmdq]]
+            ;; <condition> when variable "command-q" is 1
+            ["command-q" 1]]
+
+            [
+            ;; <from> first cmd-q (when variable "command-q" is 0)
+            :!C#Pq
+
+            ;; <to>, 2 to action
+            ;; 1. show notification with :id :cmdq, :text "Press Again to QUIT"
+            ;; 2. set variable "command-q" to 1 (for the second press)
+            [[:noti :cmdq "Press Again to QUIT"] ["command-q" 1]]
+
+            ;; <condition> nil means no required condition
+            nil
+
+            ;; <additional-option>
+            {
+            ;; to_delayed_action documentation
+            ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-delayed-action/
+            :delayed {
+                    ;; run 2 actions when no other key presses after basic.to_delayed_action_delay_milliseconds
+                    ;; 1. set variable "command-q" to 0
+                    ;; 2. cleanup notification :id :cmdq
+                    :invoked  [["command-q" 0] [:noti :cmdq]]
+
+                    ;; run 2 actions when another key presses within basic.to_delayed_action_delay_milliseconds
+                    ;; 1. set variable "command-q" to 0
+                    ;; 2. cleanup notification :id :cmdq
+                    :canceled [["command-q" 0] [:noti :cmdq]]}}]]}
+
+    {:des "left cmd -> enter or return on tap, still cmd on hold"
+        :rules [[:condi :!us-layout][:##left_command :left_command nil {:alone :return_or_enter}]]}
+
+    ;; {:des "French keyboard weird symbol-> backtick symbol"
+    ;;     :rules [[:condi :colemakdhmatrix][:##non_us_backslash :b]]}
+
+    ;; {:des "close square bracket -> backspace or delete"
+    ;;     :rules [[:condi :colemakdh][:##close_bracket :delete_or_backspace]]}
+
+    {:des "right cmd -> delete on tap, still right cmd on hold"
+        :rules [[:condi :!us-layout :!spacebar-mode][:##right_command :right_command nil {:alone :delete_forward}]]}
+
+    {:des "left shift -> Open Square Bracket on tap, still left shift on hold"
+        :rules [[:condi :!us-layout :!spacebar-mode][:##left_shift :left_shift nil {:alone :##open_bracket}]]}
+
+    {:des "right shift -> Open Square Bracket on tap, still right shift on hold"
+        :rules [[:condi :!us-layout :!spacebar-mode][:##right_shift :right_shift nil {:alone :##close_bracket}]]}
+
+    {:des "tab key -> escape key on tap, hyper on hold"
+        :rules [[:condi :!us-layout][:##tab :!CTOleft_shift nil {:alone :escape}]]}
+
+    {:des "caps_lock to tab when pressed alone, to left_control and left_option as modifier when held"
+        :rules [[:condi :!us-layout][:##caps_lock :!Tleft_option nil {:alone :tab}]]}
+
+    ;; ; swap cmd and ctrl for NON-APPLE keyboards
+    ;; {:des "swap cmd for ctrl for NON-APPLE keyboards"
+    ;;     :rules [[:condi :colemakdh :leeloo][:##left_command :left_control]]}
+    ;;     ;:rules [[:condi :colemakdh :!apple][:##left_command :left_control nil {:alone :enter}]]}
+
+    ;; {:des "swap ctrl for command for NON-APPLE keyboards"
+    ;;     :rules [[:condi :colemakdh :leeloo][:##left_control :left_command]]}
+    ;;     ;:rules [[:condi :colemakdh :!apple][:##left_command :left_control nil {:alone :enter}]]}
+
+    ;; colemakDH specific combos
+    {:des "colemakDH specific combos - aka simultaneus key presses to make shortcut" ;
+        :rules [[:condi :colemakdh]
+            [[:w :e] :!Cgrave_accent_and_tilde]         ; combo we keys --> undo (ctrl + z)
+            [[:e :r] :!SCgrave_accent_and_tilde]        ; combo er keys --> redo (ctrl + shift + z)
+            [[:grave_accent_and_tilde :z] :!Cz]         ; combo `z keys --> cut (ctrl + x)
+            [[:z :x] :!Cx]                              ; combo zx keys --> copy
+            [[:x :c] :!Cv]                              ; combo xc keys --> paste
+            [[:z :v] :!COSv]                            ; combo zv keys --> paste without formatting
+            [[:grave_accent_and_tilde :c] :!Ca]         ; combo grave_accent_and_tilde and v keys --> select all
+            [[:i :o] :hyphen]                           ; combo io keys --> - hyphen / dash
+            [[:k :l] :equal_sign]                       ; combo kl keys --> = equals sign
+            [[:comma :period] :!Shyphen]                ; combo ,. keys --> _ underscore
+            [[:period :slash] :!Sslash]                 ; combo ./ keys --> ? question mark
+            [[:slash :right_shift] :!S1]                ; combo /shift keys --> ! exclamation mark
+            [[:m :comma] :!Squote ]                     ; combo m, keys --> "" quote, move cursor between them
+            [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
+            [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new terminal within vscode
+            [[:8 :9] :!SCopen_bracket]                  ; combo 89 keys --> previous terminal/tab within vscode
+            [[:0 :hyphen] :!SCclose_bracket]            ; combo 0- keys--> next terminal/tab within vscode
+            [[:f :g] :!S2]                              ; combo as keys--> @ symbol
+            [[:h :j] [:-a :-r :-i :-c :at :-c :-o :-l :-l :-e :-g :-i :-u :-m :-b :-u :-i :-l :-t :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@collegiumbuilt.com
+            [[:m :n] [:-a :-r :-i :-c :at :-h :-e :-l :-i :-x :-i :-r :-l :-a :-b :-s :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@helixirlabs.com
+            [[:y :u] [:-a :-r :-i :-c :at :-a :-r :-i :-c :-c :-b :period :-d :-e :-v]] ; combo yu keys--> type in my email: aric@ariccb.dev
+            [[:t :y] [:-a :-r :-i :-c :-b :-o :-u :-w :-e :-r :-s :at :-o :-u :-t :-l :-o :-o :-k :period :-c :-o :-m]] ; combo ty keys--> type in my email: aricbouwers@outlook.com
+            [[:q :p] [:!Sh :k :d :d :k :j :g :k :s :d :2 :!S1]] ; combo qp keys
+            ]}
+
+    ;; {:des "combos - aka simultaneus key presses to make shortcut"
+    ;;     :rules [[:condi :colemakdhmatrix]
+    ;;         ;; [[:w :e] :!Cz]         ; combo we keys --> undo (ctrl + z)
+    ;;         ;; [[:e :r] :!SCz]        ; combo er keys --> redo (ctrl + shift + z)
+    ;;         ;; [[:z :x] :!Cx]         ; combo zx keys --> cut (ctrl + x)
+    ;;         ;; [[:x :c] :!Cc]                              ; combo xc keys --> copy
+    ;;         ;; [[:c :d] :!Cd]                              ; combo cd keys --> paste
+    ;;         ;; [[:x :v] :!COSv]                            ; combo xv keys --> paste without formatting
+    ;;         ;; [[:z :d] :!Ca]                              ; combo z and d keys --> select all
+    ;;         [[:i :o] :hyphen]                           ; combo io keys --> - hyphen / dash
+    ;;         [[:k :l] :equal_sign]                       ; combo kl keys --> = equals sign
+    ;;         [[:comma :period] :!Shyphen]                ; combo ,. keys --> _ underscore
+    ;;         [[:period :slash] :!Sslash]                 ; combo ./ keys --> ? question mark
+    ;;         [[:slash :right_shift] :!S1]                ; combo /shift keys --> ! exclamation mark
+    ;;         [[:m :comma] :!Squote ]                     ; combo m, keys --> "" quote, move cursor between them
+    ;;         [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
+    ;;         [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new terminal within vscode
+    ;;         [[:8 :9] :!SCopen_bracket]                  ; combo 89 keys --> previous terminal/tab within vscode
+    ;;         [[:0 :hyphen] :!SCclose_bracket]            ; combo 0- keys--> next terminal/tab within vscode
+    ;;         [[:f :g] :!S2]                              ; combo as keys--> @ symbol
+    ;;         [[:h :j] [:-a :-r :-i :-c :at :-c :-o :-l :-l :-e :-g :-i :-u :-m :-b :-u :-i :-l :-t :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@collegiumbuilt.com
+    ;;         [[:m :n] [:-a :-r :-i :-c :at :-h :-e :-l :-i :-x :-i :-r :-l :-a :-b :-s :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@helixirlabs.com
+    ;;         [[:y :u] [:-c :-o :-n :-t :-a :-c :-t :at :-a :-r :-i :-c :-c :-b :period :-d :-e :-v]] ; combo yu keys--> type in my email: contact@ariccb.dev
+    ;;         [[:t :y] [:-a :-r :-i :-c :-b :-o :-u :-w :-e :-r :-s :at :-o :-u :-t :-l :-o :-o :-k :period :-c :-o :-m]] ; combo ty keys--> type in my email: aricbouwers@outlook.com
+    ;;         [[:q :p] [:!Sh :k :d :d :k :j :g :k :s :d :2 :!S1]] ; combo qp keys
+    ;;         ]}
+
+
+    {
+        :des "Application Layer - Hold Q to trigger"
+        :rules [
+            :apps ; hold 'q' to activate
+                ; most used apps
+                [:-v [:open "Visual Studio Code"]]    ; editor
+        ]
+    }
+
+    {:des "p adaptive key" ; for words like "option"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If p-adapt mode is on, run this command when p is pressed or qheld. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##e :##f [:p-adapt]] ;
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##r :##r nil ; the -p doesn't work with the ## modifier
+            ; and if p is pressed alone or held, trigger p-adapt mode
+            {:alone ["p-adapt" 1] :held ["p-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["p-adapt" 0] :canceled ["p-adapt" 0]}}]
+        ]
+    }
+
+        {:des "b adaptive key" ; for words like "option"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If b-adapt mode is on, run this command when p is pressed or qheld. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##e :##f [:b-adapt]] ;
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##t :##t nil ; the -p doesn't work with the ## modifier
+            ; and if p is pressed alone or held, trigger b-adapt mode
+            {:alone ["b-adapt" 1] :held ["b-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["b-adapt" 0] :canceled ["b-adapt" 0]}}]
+        ]
+    }
+
+    {:des "l adaptive key" ; for words like "milk"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If l-adapt mode is on, run this command when l is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##y :##n [:l-adapt]] ; // in colemak y=j and n=k and u=l, so its pressing lj -> lk
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##u :##u nil ; the -l doesn't work with the ## modifier
+            ; and if l is pressed alone or held, trigger l-adapt mode
+            {:alone ["l-adapt" 1] :held ["l-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["l-adapt" 0] :canceled ["l-adapt" 0]}}]
+        ]
+    }
+
+    {:des "s adaptive key" ; for words like "school"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If s-adapt mode is on, run this command when s is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##v :##x [:s-adapt]] ;
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##d :##d nil ; the -s doesn't work with the ## modifier
+            ; and if l is pressed alone or held, trigger s-adapt mode
+            {:alone ["s-adapt" 1] :held ["s-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["s-adapt" 0] :canceled ["s-adapt" 0]}}]
+        ]
+    }
+
+    {:des "f adaptive key" ; for words like "leafs, and ployoffs"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If f-adapt mode is on, run this command when f is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##w :##d [:f-adapt]] ;
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##e :##e nil ; the -f doesn't work with the ## modifier
+            ; and if p is pressed alone or held, trigger f-adapt mode
+            {:alone ["f-adapt" 1] :held ["f-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["f-adapt" 0] :canceled ["f-adapt" 0]}}]
+        ]
+    }
+
+    {
+        :des "u adaptive key" ; for words like "fuel"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If u-adapt mode is on, run this command when u is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##o :##k [:u-adapt]] ;
+            [:##p :##o [:u-adapt]] ;
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##i :##i nil ; i=u, the -u doesn't work with the ## modifier
+            ; and if u is pressed alone or held, trigger u-adapt mode
+            {:alone ["u-adapt" 1] :held ["u-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["u-adapt" 0] :canceled ["u-adapt" 0]}}]
+        ]
+    }
+
+    {
+        :des "d adaptive key" ; for words like "edge, and midpoint"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If d-adapt mode is on, run this command when d is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##z :##g [:d-adapt]] ; for words like "edge"
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##c :##c nil ; i=u, the -d doesn't work with the ## modifier
+            ; and if u is pressed alone or held, trigger d-adapt mode
+            {:alone ["d-adapt" 1] :held ["d-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["d-adapt" 0] :canceled ["d-adapt" 0]}}]
+        ]
+    }
+
+    {
+        :des "t adaptive key" ; for words like "edge, and midpoint"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If t-adapt mode is on, run this command when t is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##q :##t [:t-adapt]] ; for words like "setback, and seatbelt"
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##f :##f nil ;the key that starts the adaptive key
+            ; and if u is pressed alone or held, trigger t-adapt mode
+            {:alone ["t-adapt" 1] :held ["t-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["t-adapt" 0] :canceled ["t-adapt" 0]}}]
+        ]
+    },
+
+    {
+        :des "c adaptive key" ; for words like "edge, and midpoint"
+        :rules [[:condi :!spacebar-mode :!a-mode :colemakdh]
+            ; If c-adapt mode is on, run this command when s is pressed or held. Anything that depends
+            ; on the mode being set must come _before_ the delayed declaration.
+
+            ; adaptive keys set here
+            [:##z :##d [:c-adapt]] ; for words like "discs, and docs x
+
+            ; delayed declation set here - ensures if any other key than the one specified above is pressed, it will cancel the mode
+            [:##x :##x nil ;the key that starts the adaptive key
+            ; and if c is pressed alone or held, trigger c-adapt mode
+            {:alone ["c-adapt" 1] :held ["c-adapt" 1]
+            ; when another key is invoked, or after a timeout, set the mode back to zero
+            :delayed {:invoked ["c-adapt" 0] :canceled ["c-adapt" 0]}}]
+        ]
+    },
+
+    ;; this is an examp+e of how to implement a adaptive key mode allowing dy
+    ;; collected from the url "https://github.com/kiinoda/goku/blob/experimental/karabiner.edn"
+    ;;  {
+    ;;         :des "Symbols Layer - press LShift and release to trigger"
+    ;;         :rules [
+    ;;             [:left_shift :left_shift [:!symbols :!shifted :!blocked] {:alone ["symbols" 1] :delayed {:invoked ["symbols" 0] :cancelled ["symbols" 0]}}]
+    ;;             [:right_shift :right_shift [:!symbols :!shifted :!blocked] {:alone ["symbols" 1] :delayed {:invoked ["symbols" 0] :cancelled ["symbols" 0]}}]
+    ;;             :symbols
+    ;;                 ; symbols - mnemonics reflect Colemak layout
+    ;;                 [:left_shift :colon :symbols {:afterup ["symbols" 0]}]               ; ???
+    ;;                 [:-w :tilde nil {:afterup ["symbols" 0]}]                            ; wave
+    ;;                 [:-p :percent nil {:afterup ["symbols" 0]}]                          ; percent
+    ;;                 [:-l :plus nil {:afterup ["symbols" 0]}]                             ; pLus
+    ;;                 [:-u :underscore nil {:afterup ["symbols" 0]}]                       ; underscore
+    ;;                 [:-y :hyphen nil {:afterup ["symbols" 0]}]                           ; hYphen
+    ;;                 [:-semicolon :backquote nil {:afterup ["symbols" 0]}]                ; ?
+    ;;                 [:-a :at nil {:afterup ["symbols" 0]}]                               ; at
+    ;;                 [:-s :ampersand nil {:afterup ["symbols" 0]}]                        ; amperSand
+    ;;                 [:-d :dollar nil {:afterup ["symbols" 0]}]                           ; dollar
+    ;;                 [:-h :hash nil {:afterup ["symbols" 0]}]                             ; hash
+    ;;                 [:-e :exclaim nil {:afterup ["symbols" 0]}]                          ; exclaim
+    ;;                 [:-o :semicolon nil {:afterup ["symbols" 0]}]                        ; semicOlon
+    ;;                 [:-c :caret nil {:afterup ["symbols" 0]}]                            ; caret
+    ;;                 [:-v :pipe nil {:afterup ["symbols" 0]}]                             ; vertical
+    ;;                 [:-b :backslash nil {:afterup ["symbols" 0]}]                        ; backslash
+    ;;                 [:-k :equal nil {:afterup ["symbols" 0]}]                            ; eKual
+    ;;                 [:-m :bullet nil {:afterup ["symbols" 0]}]                           ; multiply
+    ;;                 [:slash :!Sslash nil {:afterup ["symbols" 0]}]                       ; slash
+    ;;                 ; [:up_arrow :!Sslash [:symbols :velocifire] {:afterup ["symbols" 0]}] ; slash
+    ;;                 ; sequence - parens, brackets and braces
+    ;;                 [:-g :open_brace nil {:afterup ["symbols" 0]}]
+    ;;                 [:-j :close_brace nil {:afterup ["symbols" 0]}]
+    ;;                 [:-r :open_bracket nil {:afterup ["symbols" 0]}]
+    ;;                 [:-t :open_paren nil {:afterup ["symbols" 0]}]
+    ;;                 [:-n :close_paren nil {:afterup ["symbols" 0]}]
+    ;;                 [:-i :close_bracket nil {:afterup ["symbols" 0]}]
+    ;;                 ; sequence - cancelled keypresses (can be repurposed)
+    ;;                 [:-q :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:-f :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:-z :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:-x :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:hyphen :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:equal_sign :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:open_bracket :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:close_bracket :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 ; sequence - symbols on the original keys but shifted for ease of use
+    ;;                 [:comma :less_than nil {:afterup ["symbols" 0]}]
+    ;;                 [:period :greater_than nil {:afterup ["symbols" 0]}]
+    ;;                 [:quote :dquote nil {:afterup ["symbols" 0]}]
+    ;;                 [:backslash :pipe nil {:afterup ["symbols" 0]}]
+    ;;                 [:btick :tilde nil {:afterup ["symbols" 0]}]
+    ;;                 ; scrubbing - undefine all unused keys
+    ;;                 [:any_key :vk_none nil {:afterup ["symbols" 0]}]
+    ;;                 [:any_consumer :vk_none nil {:afterup ["symbols" 0]}]
+    ;;         ]
+    ;;     }
+
+    ;; {:des "one-shot-shift-mode - tap left shift then keys will still produce shifted result"
+    ;; :rules [
+    ;;         ; If right-shift-mode is on, run this command when a is pressed. Anything that depends
+    ;;         ; on the mode being set must come _before_ the delayed declaration.
+    ;;         [:non_us_backslash :grave_accent_and_tilde [:one-shot-shift-mode]]
+    ;;         [:q :!Sq [:one-shot-shift-mode]]
+    ;;         [:w :!Sw [:one-shot-shift-mode]]
+    ;;         [:e:!Se [:one-shot-shift-mode]]
+    ;;         [:r:!Sr [:one-shot-shift-mode]]
+    ;;         [:t:!St [:one-shot-shift-mode]]
+    ;;         [:y:!Sy [:one-shot-shift-mode]]
+    ;;         [:u:!Su [:one-shot-shift-mode]]
+    ;;         [:i:!Si [:one-shot-shift-mode]]
+    ;;         [:o:!So [:one-shot-shift-mode]]
+    ;;         [:p:!Sp [:one-shot-shift-mode]]
+    ;;         [:semicolon:!Ssemicolon [:one-shot-shift-mode]]
+    ;;         [:a:!Sa [:one-shot-shift-mode]]
+    ;;         [:s:!Ss [:one-shot-shift-mode]]
+    ;;         [:d:!Sd [:one-shot-shift-mode]]
+    ;;         [:f:!Sf [:one-shot-shift-mode]]
+    ;;         [:g:!Sg [:one-shot-shift-mode]]
+    ;;         [:h:!Sh [:one-shot-shift-mode]]
+    ;;         [:h:!Sh [:one-shot-shift-mode]]
+
+
+
+    ;;         ; Send right_shift unconditionally (so it still works as a modifier key)
+    ;;         [:left_shift :left_shift nil
+    ;;         ; and if pressed alone, trigger right-shift-mode
+    ;;         {:alone [:left_shift ["one-shot-shift-mode" 1]]
+    ;;         ; when another key is invoked, or after a timeout, set the mode back to zero
+    ;;         :delayed {:invoked ["one-shot-shift-mode" 0] :canceled ["one-shot-shift-mode" 0]}}]]}
+
+    {:des "symbols and numbers layer"
+        :rules [[:condi :spacebar-mode :!us-layout] ; hold spacebar to use the numbers and symbols layer only on colemak-dh keyboard layout
+
+    ;; ! < > = ^   * 7 8 9 : ?
+     ;; # [ ( ) ]   & 4 5 6 - + \
+    ;; @ $ { } % ~ | 1 2 3 / *
+    ;;                   0 .
+
+            ;; first row
+            [:non_us_backslash :non_us_backslash] ;;§
+            [:tab :b] ;; `
+            [:q :!S1] ;; !
+            [:w :!Scomma] ;; <
+            [:e :!Speriod] ;; >
+            [:r :equal_sign] ;; =
+            [:t :!S6] ;; ^
+            [:y :!S8] ;; *
+            [:u :7] ;; 7
+            [:i :8] ;; 8
+            [:o :9] ;; 9
+            [:p :!Sp] ;; :
+            [:open_bracket :hyphen] ;; -
+            [:close_bracket :!Sequal_sign] ;; +
+            ;; second row
+            [:caps_lock :!Stab] ;;
+            [:a :!S3] ;; #
+            [:s :open_bracket] ;; [
+            [:d :!S9] ;; (
+            [:f :!S0] ;; )
+            [:g :close_bracket] ;; ]
+            [:h :!S7] ;; &
+            [:j :4] ;; 4
+            [:k :5] ;; 5
+            [:l :6] ;; 6
+            [:semicolon :hyphen] ;; -
+            [:quote :!Sequal_sign] ;; +
+            [:backslash :backslash] ;; \
+            ;; third row
+            [:grave_accent_and_tilde :!S2] ;; ~
+            [:z :!S4] ;;
+            [:x :!Sopen_bracket] ;; {
+            [:c :!Sclose_bracket] ;; }
+            [:v :!S5] ;; %
+            [:b :!Sb] ;; @
+            [:n :!Sbackslash] ;; |
+            [:m :1] ;; 1
+            [:comma :2] ;; 2
+            [:period :3] ;; 3
+            [:right_shift :!S8] ;; *
+            [:right_command :0] ;; 0
+            [:right_option :period] ;; .
+        ]}
+    {:des "leader key (period held)"
+        :rules [[:condi :period-mode] ; hold caps-lock to use the predefned keysequences only on colemak-dh keyboard layout
+            [:a [:!S9 :!S0 :spacebar :equal_sign :!Speriod :spacebar :!Sopen_bracket ]] ; arrow function
+            [:s [:e :i :j :x :f :l :semicolon :j :spacebar :e :i :j :x :!Sj :a :h :k :!S9 :!S0 :spacebar :!Sopen_bracket :return_or_enter :s :k :f :i :s :j :up_arrow :!Oright_arrow :!SOleft_arrow]] ; arrow function
+            [:b [:b :b :b :return_or_enter :b :b :b :up_arrow :!Cright_arrow]] ; [.`] = code block
+            [:f [:hyphen :spacebar :open_bracket :spacebar :close_bracket :spacebar]] ; obsidian javascript code block
+            [:c [:!Scomma :c :l :v :!Speriod :!Scomma :slash :c :l :v :!Speriod :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow]] ; <div></div>
+            [:g [:!Scomma :f :a :g :!Speriod :!Scomma :slash :f :a :g :!Speriod :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :!Cc :!Cc]] ;generic html tag, select both for editing <tag></tag>
+            [:comma [:x :semicolon :j :d :semicolon :u :k :period :u :semicolon :g :!S9 :!S0 :left_arrow]]
+            [:m [:slash :!S8 :!S8 :right_arrow :!S8 :left_arrow :return_or_enter :up_arrow :spacebar]]
+        ]}
+
+    {:des "a-mode - navigation layer"
+        :rules [[:condi :a-mode :!us-layout] ;; only works on colemak-dh keyboard layout
+            ; ← ↓ ↑ → PgDn PgUp Home End
+            [:##j :##left_arrow  ]
+            [:##k :##down_arrow  ]
+            [:##i :##up_arrow    ]
+            [:##l :##right_arrow ]
+            [:##period :##page_down]
+            [:##m :##page_up]
+            [:##comma :!COdown_arrow]
+            [:##u :##home]
+            [:##o :##end]
+            [:##s [:##left_option] nil {:to_if_held_down :left_option :alone :f5}]    ; alt on windows
+            [:##d [:##left_shift] nil {:to_if_held_down :left_shift :alone :f6}]      ; shift on windows
+            [:##f [:##left_command] nil {:to_if_held_down :left_command :alone :f7}]  ; Windows key on windows
+            [:##g [:##left_control] nil {:to_if_held_down :left_control :alone :f8}]  ; control on windows
+            [:##z :f1]
+            [:##x :f2]
+            [:##c :f3]
+            [:##v :f4]
+            [:##w :f9]
+            [:##e :f10]
+            [:##r :f11]
+            [:##t :f12]
+            [:##slash :!Sbackslash]
+            ;; switch applications
+            [:##semicolon :!Ctab]
+            [:##quote :!CStab] ;
+
+            ;; switch tabs in most apps
+            [:##b :!CSopen_bracket]
+            [:##n :!Ttab]
+            [:##h :!TStab]
+
+            ;; VSCode ctrl cmd →
+            ;; [:!Cleft_arrow :!CTleft_arrow]
+            ;; [:!Cright_arrow :!CTright_arrow]
+    ]}
+
+    ; {:des "caps-mode - navigation layer"
+    ;     :rules [[:condi :nav-mode :colemakdh] ;; only works on colemak-dh keyboard layout
+    ;
+    ;         [:##j :##left_arrow  ]
+    ;         [:##k :##down_arrow  ]
+    ;         [:##i :##up_arrow    ]
+    ;         [:##l :##right_arrow ]
+    ;         [:##period :##page_down]
+    ;         [:##m :##page_up]
+    ;         [:##comma :!COdown_arrow]
+    ;         [:##u :##home]
+    ;         [:##o :##end]
+    ;         [:##s :left_option] ; alt on windows
+    ;         [:##d :left_shift] ; shift on windows
+    ;         [:##f :left_command] ; Windows key on windows
+    ;         [:##g :left_control] ; control on windows
+    ;         [:##slash :!Sbackslash]
+    ;
+    ;         ;; switch tabs in most applications
+    ;         ;; Cmd Shift [
+    ;         [:##v :!CSopen_bracket]
+    ;         ;; Cmd Shift ]
+    ;         [:##b :!CSclose_bracket]
+    ;
+    ;         ;; VSCode ctrl cmd →
+            ;; [:!Cleft_arrow :!CTleft_arrow]
+            ;; [:!Cright_arrow :!CTright_arrow]
+    ;  ]}
+
+    ;; {
+    ;;     :des "Shifted Layer - press RShift to trigger"
+    ;;     :rules [
+    ;;         [:right_shift :right_shift [:!shifted :!symbols :!blocked] {:alone ["shifted" 1] :delayed {:invoked ["shifted" 0] :cancelled ["shifted" 0]}}]
+    ;;         :shifted
+    ;;             ; capital letters
+    ;;             [:-q :!Sq nil {:afterup ["shifted" 0]}]
+    ;;             [:-w :!Sw nil {:afterup ["shifted" 0]}]
+    ;;             [:-f :!Sf nil {:afterup ["shifted" 0]}]
+    ;;             [:-p :!Sp nil {:afterup ["shifted" 0]}]
+    ;;             [:-g :!Sg nil {:afterup ["shifted" 0]}]
+    ;;             [:-j :!Sj nil {:afterup ["shifted" 0]}]
+    ;;             [:-l :!Sl nil {:afterup ["shifted" 0]}]
+    ;;             [:-u :!Su nil {:afterup ["shifted" 0]}]
+    ;;             [:-y :!Sy nil {:afterup ["shifted" 0]}]
+    ;;             [:-a :!Sa nil {:afterup ["shifted" 0]}]
+    ;;             [:-r :!Sr nil {:afterup ["shifted" 0]}]
+    ;;             [:-s :!Ss nil {:afterup ["shifted" 0]}]
+    ;;             [:-t :!St nil {:afterup ["shifted" 0]}]
+    ;;             [:-d :!Sd nil {:afterup ["shifted" 0]}]
+    ;;             [:-h :!Sh nil {:afterup ["shifted" 0]}]
+    ;;             [:-n :!Sn nil {:afterup ["shifted" 0]}]
+    ;;             [:-e :!Se nil {:afterup ["shifted" 0]}]
+    ;;             [:-i :!Si nil {:afterup ["shifted" 0]}]
+    ;;             [:-o :!So nil {:afterup ["shifted" 0]}]
+    ;;             [:-z :!Sz nil {:afterup ["shifted" 0]}]
+    ;;             [:-x :!Sx nil {:afterup ["shifted" 0]}]
+    ;;             [:-c :!Sc nil {:afterup ["shifted" 0]}]
+    ;;             [:-v :!Sv nil {:afterup ["shifted" 0]}]
+    ;;             [:-b :!Sb nil {:afterup ["shifted" 0]}]
+    ;;             [:-k :!Sk nil {:afterup ["shifted" 0]}]
+    ;;             [:-m :!Sm nil {:afterup ["shifted" 0]}]
+    ;;             ; scrubbing - undefine all unused keys
+    ;;             [:any_key :vk_none nil {:afterup ["shifted" 0]}]
+    ;;             [:any_consumer :vk_none nil {:afterup ["shifted" 0]}]
+    ;;     ]
+    ;; }
+
+
+
+
+] ;; main list
+
+}
+
+;; rule [:period ["media-mode" 1] nil {:afterup ["media-mode" 0] :alone :period}]
+;;       |_____| |_______________| |_| |_________________________________________|
+;;        <from>    <to>      <conditions>         <other options>
+;;
+;; !  | means mandatory -   modifier(s) alone when pressend change behavior
+;; #  | means optional  -   modifiers are optional (but atleast one necessary)
+;;
+;; :!Ca is keycode :a and prefix a with !C
+;;
+;; C  | left_command
+;; T  | left_control
+;; O  | left_option
+;; S  | left_shift
+;; F  | fn
+;; Q  | right_command
+;; W  | right_control
+;; E  | right_option
+;; R  | right_shift
+;; P  | caps_lock
+;;
+;; ## | optional any (this has no effect when used on the RHS; only LHS)
+;; !! | command + control + option + shift (hyper)
+;;
+;; to understand better how modifiers work in karabiner
+;; karabiner definition of mandatory and optional
+;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/modifiers/
+;;
+;; need to prefix C T O S F P with ! or #
+;;
+;; code for all this:
+;; https://github.com/yqrashawn/GokuRakuJoudo/blob/b9b334a187379f9bc8182ad59e2cca2a1789e9c0/src/karabiner_configurator/keys.clj#L68
+;;
+;;
+;; list of keys usable in Karabiner
+;; https://github.com/pqrs-org/Karabiner-Elements/issues/925#issuecomment-323984568
+;;
+;; Sample mouse event remapping
+;; Could be used in a layer. Intercepting events from mice interferes with the scrollwheel.
+;; [{:pkey :button2} :delete_forward]
+;;
+;;
+;; URL of extend layer - https://forum.colemak.com/topic/2014-extend-extra-extreme/
