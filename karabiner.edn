@@ -152,6 +152,8 @@
         "^com\\.googlecode\\.iterm2$"]
     ;; :safari [ "^com.apple.Safari$" ]
     :vscode [ "^com.microsoft.VSCode$" ]
+    :arc ["^company.thebrowser.Browser$"]
+
     ;; :opera [ "^com.operasoftware.Opera$" ]
     ;; :chrome [ "^com.google.Chrome$" ]
     ;; :emacs [ "^org.gnu.Emacs$" ]
@@ -310,12 +312,12 @@
     ;; (custom variables) & modifiers -> Advanced
     ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#custom-variable
 
-    {:des "leeloo specific mappings"
-    :rules [:leeloo
-        [:left_control :left_command]
-        [:left_command :left_control]
-    ;;  [:right_option :right_control]
-    ]}
+    ;; {:des "leeloo specific mappings"
+    ;; :rules [:colemakdhmatrix
+    ;;     [:left_control :left_command]
+    ;;     [:left_command :left_control]
+    ;; ;;  [:right_option :right_control]
+    ;; ]}
 
     {:des   "Quit application by pressing command-q twice"
         :rules [[
@@ -375,7 +377,7 @@
         :rules [[:condi :!us-layout :!spacebar-mode][:##right_shift :right_shift nil {:alone :##close_bracket}]]}
 
     {:des "tab key -> escape key on tap, hyper on hold"
-        :rules [[:condi :!us-layout][:##tab :!CTOleft_shift nil {:alone :escape}]]}
+        :rules [[:condi :colemakdh][:##tab :!CTOleft_shift nil {:alone :escape}]]}
 
     {:des "caps_lock to tab when pressed alone, to left_control and left_option as modifier when held"
         :rules [[:condi :!us-layout][:##caps_lock :!Tleft_option nil {:alone :tab}]]}
@@ -390,60 +392,78 @@
     ;;     ;:rules [[:condi :colemakdh :!apple][:##left_command :left_control nil {:alone :enter}]]}
 
     ;; colemakDH specific combos
+    {:des "colemakDH specific combos - aka simultaneus key presses to make shortcut with apple condition" ;
+    :rules [[:condi :colemakdh]
+        [[:w :e] :!Cgrave_accent_and_tilde]         ; combo we keys --> undo (ctrl + z)
+        [[:e :r] :!SCgrave_accent_and_tilde]        ; combo er keys --> redo (ctrl + shift + z)
+        [[:grave_accent_and_tilde :z] :!Cz]         ; combo `z keys --> cut (ctrl + x)
+        [[:z :x] :!Cx]                              ; combo zx keys --> copy
+        [[:x :c] :!Cv]                              ; combo xc keys --> paste
+        [[:z :v] :!COSv]                            ; combo zv keys --> paste without formatting
+        [[:grave_accent_and_tilde :c] :!Ca]         ; combo grave_accent_and_tilde and v keys --> select all
+        ]}
+
     {:des "colemakDH specific combos - aka simultaneus key presses to make shortcut" ;
-        :rules [[:condi :colemakdh]
-            [[:w :e] :!Cgrave_accent_and_tilde]         ; combo we keys --> undo (ctrl + z)
-            [[:e :r] :!SCgrave_accent_and_tilde]        ; combo er keys --> redo (ctrl + shift + z)
-            [[:grave_accent_and_tilde :z] :!Cz]         ; combo `z keys --> cut (ctrl + x)
-            [[:z :x] :!Cx]                              ; combo zx keys --> copy
-            [[:x :c] :!Cv]                              ; combo xc keys --> paste
-            [[:z :v] :!COSv]                            ; combo zv keys --> paste without formatting
-            [[:grave_accent_and_tilde :c] :!Ca]         ; combo grave_accent_and_tilde and v keys --> select all
-            [[:i :o] :hyphen]                           ; combo io keys --> - hyphen / dash
-            [[:k :l] :equal_sign]                       ; combo kl keys --> = equals sign
-            [[:comma :period] :!Shyphen]                ; combo ,. keys --> _ underscore
-            [[:period :slash] :!Sslash]                 ; combo ./ keys --> ? question mark
-            [[:slash :right_shift] :!S1]                ; combo /shift keys --> ! exclamation mark
-            [[:m :comma] :!Squote ]                     ; combo m, keys --> "" quote, move cursor between them
-            [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
-            [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new terminal within vscode
-            [[:8 :9] :!SCopen_bracket]                  ; combo 89 keys --> previous terminal/tab within vscode
-            [[:0 :hyphen] :!SCclose_bracket]            ; combo 0- keys--> next terminal/tab within vscode
-            [[:f :g] :!S2]                              ; combo as keys--> @ symbol
-            [[:h :j] [:-a :-r :-i :-c :at :-c :-o :-l :-l :-e :-g :-i :-u :-m :-b :-u :-i :-l :-t :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@collegiumbuilt.com
-            [[:m :n] [:-a :-r :-i :-c :at :-h :-e :-l :-i :-x :-i :-r :-l :-a :-b :-s :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@helixirlabs.com
-            [[:y :u] [:-a :-r :-i :-c :at :-a :-r :-i :-c :-c :-b :period :-d :-e :-v]] ; combo yu keys--> type in my email: aric@ariccb.dev
-            [[:t :y] [:-a :-r :-i :-c :-b :-o :-u :-w :-e :-r :-s :at :-o :-u :-t :-l :-o :-o :-k :period :-c :-o :-m]] ; combo ty keys--> type in my email: aricbouwers@outlook.com
-            [[:q :p] [:!Sh :k :d :d :k :j :g :k :s :d :2 :!S1]] ; combo qp keys
-            ]}
+    :rules [[:condi :colemakdh ]
+        [[:i :o] :hyphen]                           ; combo io keys --> - hyphen / dash
+        [[:k :l] :equal_sign]                       ; combo kl keys --> = equals sign
+        [[:comma :period] :!Shyphen]                ; combo ,. keys --> _ underscore
+        [[:period :slash] :!Sslash]                 ; combo ./ keys --> ? question mark
+        [[:slash :right_shift] :!S1]                ; combo /shift keys --> ! exclamation mark
+        [[:m :comma] :!Squote ]                     ; combo m, keys --> "" quote, move cursor between them
+        [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
+        [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new terminal within vscode
+        [[:8 :9] :!SCopen_bracket]                  ; combo 89 keys --> previous terminal/tab within vscode
+        [[:0 :hyphen] :!SCclose_bracket]            ; combo 0- keys--> next terminal/tab within vscode
+        [[:f :g] :!S2]                              ; combo as keys--> @ symbol
+        [[:h :j] [:-a :-r :-i :-c :at :-c :-o :-l :-l :-e :-g :-i :-u :-m :-b :-u :-i :-l :-t :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@collegiumbuilt.com
+        [[:m :n] [:-a :-r :-i :-c :at :-h :-e :-l :-i :-x :-i :-r :-l :-a :-b :-s :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@helixirlabs.com
+        [[:y :u] [:-a :-r :-i :-c :at :-a :-r :-i :-c :-c :-b :period :-d :-e :-v]] ; combo yu keys--> type in my email: aric@ariccb.dev
+        [[:t :y] [:-a :-r :-i :-c :-b :-o :-u :-w :-e :-r :-s :at :-o :-u :-t :-l :-o :-o :-k :period :-c :-o :-m]] ; combo ty keys--> type in my email: aricbouwers@outlook.com
+        [[:q :p] [:!Sh :k :d :d :k :j :g :k :s :d :2 :!S1]] ; combo qp keys
+        ]}
 
-    ;; {:des "combos - aka simultaneus key presses to make shortcut"
-    ;;     :rules [[:condi :colemakdhmatrix]
-    ;;         ;; [[:w :e] :!Cz]         ; combo we keys --> undo (ctrl + z)
-    ;;         ;; [[:e :r] :!SCz]        ; combo er keys --> redo (ctrl + shift + z)
-    ;;         ;; [[:z :x] :!Cx]         ; combo zx keys --> cut (ctrl + x)
-    ;;         ;; [[:x :c] :!Cc]                              ; combo xc keys --> copy
-    ;;         ;; [[:c :d] :!Cd]                              ; combo cd keys --> paste
-    ;;         ;; [[:x :v] :!COSv]                            ; combo xv keys --> paste without formatting
-    ;;         ;; [[:z :d] :!Ca]                              ; combo z and d keys --> select all
-    ;;         [[:i :o] :hyphen]                           ; combo io keys --> - hyphen / dash
-    ;;         [[:k :l] :equal_sign]                       ; combo kl keys --> = equals sign
-    ;;         [[:comma :period] :!Shyphen]                ; combo ,. keys --> _ underscore
-    ;;         [[:period :slash] :!Sslash]                 ; combo ./ keys --> ? question mark
-    ;;         [[:slash :right_shift] :!S1]                ; combo /shift keys --> ! exclamation mark
-    ;;         [[:m :comma] :!Squote ]                     ; combo m, keys --> "" quote, move cursor between them
-    ;;         [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
-    ;;         [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new terminal within vscode
-    ;;         [[:8 :9] :!SCopen_bracket]                  ; combo 89 keys --> previous terminal/tab within vscode
-    ;;         [[:0 :hyphen] :!SCclose_bracket]            ; combo 0- keys--> next terminal/tab within vscode
-    ;;         [[:f :g] :!S2]                              ; combo as keys--> @ symbol
-    ;;         [[:h :j] [:-a :-r :-i :-c :at :-c :-o :-l :-l :-e :-g :-i :-u :-m :-b :-u :-i :-l :-t :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@collegiumbuilt.com
-    ;;         [[:m :n] [:-a :-r :-i :-c :at :-h :-e :-l :-i :-x :-i :-r :-l :-a :-b :-s :period :-c :-o :-m]] ; combo hj keys--> type in my email: aric@helixirlabs.com
-    ;;         [[:y :u] [:-c :-o :-n :-t :-a :-c :-t :at :-a :-r :-i :-c :-c :-b :period :-d :-e :-v]] ; combo yu keys--> type in my email: contact@ariccb.dev
-    ;;         [[:t :y] [:-a :-r :-i :-c :-b :-o :-u :-w :-e :-r :-s :at :-o :-u :-t :-l :-o :-o :-k :period :-c :-o :-m]] ; combo ty keys--> type in my email: aricbouwers@outlook.com
-    ;;         [[:q :p] [:!Sh :k :d :d :k :j :g :k :s :d :2 :!S1]] ; combo qp keys
-    ;;         ]}
+        {
+        :des "colemakDH specific combos - aka simultaneus key presses to make shortcut with leeloo condition"
+        :rules [
+        [:condi :colemakdhmatrix]
+        [[:w :f] :!Cz]                              ; combo we keys --> undo (ctrl + z)
+        [[:e :r] :!SCz]                             ; combo er keys --> redo (ctrl + shift + z)
+        [[:z :x] :!Cx]                              ; combo zx keys --> cut (ctrl + x)
+        [[:x :c] :!Cc]                              ; combo xc keys --> copy
+        [[:c :d] :!Cd]                              ; combo cd keys --> paste
+        [[:x :grave_accent_and_tilde] :!COSgrave_accent_and_tilde] ; combo x` keys --> paste without formatting
+        [[:z :d] :!Ca]                              ; combo zd keys --> select all
+        ]
+    }
 
+    {
+        :des "combos - aka simultaneus key presses to make shortcut for ABC input source"
+        :rules [[:condi :abc]
+        [[:w :f] :!Cz]         ; combo wf keys --> undo (ctrl + z)
+        [[:f :p] :!SCz]        ; combo fp keys --> redo (ctrl + shift + z)
+        [[:x :c] :!Cx]         ; combo xc keys --> cut (ctrl + x)
+        [[:c :d] :!Cc]         ; combo cd keys --> copy
+        [[:d :v] :!Cv]         ; combo dv keys --> paste
+        [[:c :grave_accent_and_tilde] :!COSv] ; combo c` keys --> paste without formatting
+        [[:x :v] :!Ca]         ; combo xv keys --> select all
+        [[:u :y] :hyphen]      ; combo uy keys --> - hyphen / dash
+        [[:n :h] :equal_sign]  ; combo nh keys --> = equals sign
+        [[:comma :period] :!Shyphen] ; combo ,. keys --> _ underscore
+        [[:period :slash] :!Sslash]  ; combo ./ keys --> ? question mark
+        [[:slash :right_shift] :!S1] ; combo /shift keys --> ! exclamation mark
+        [[:k :comma] :!Squote] ; combo k, keys --> "" quote, move cursor between them
+        [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
+        [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new terminal within vscode
+        [[:8 :9] :!SCopen_bracket]                  ; combo 89 keys --> previous terminal/tab within vscode
+        [[:0 :hyphen] :!SCclose_bracket]            ; combo 0- keys--> next terminal/tab within vscode
+        [[:t :g] :!S2]                              ; combo tg keys--> @ symbol
+        [[:m :n] [:-a :-r :-i :-c :at :-c :-o :-l :-l :-e :-g :-i :-u :-m :-b :-u :-i :-l :-t :period :-c :-o :-m]] ; combo mn keys--> type in my email: aric@collegiumbuilt.com
+        [[:h :comma] [:-a :-r :-i :-c :at :-h :-e :-l :-i :-x :-i :-r :-l :-a :-b :-s :period :-c :-o :-m]] ; combo h, keys--> type in my email: aric@helixirlabs.com
+        [[:j :l] [:-c :-o :-n :-t :-a :-c :-t :at :-a :-r :-i :-c :-c :-b :period :-d :-e :-v]] ; combo jl keys--> type in my email: contact@ariccb.dev
+        [[:b :j] [:-a :-r :-i :-c :-b :-o :-u :-w :-e :-r :-s :at :-o :-u :-t :-l :-o :-o :-k :period :-c :-o :-m]] ; combo bj keys--> type in my email: aricbouwers@outlook.com
+        [[:q :semicolon] [:!Sh :k :d :d :k :j :g :k :s :d :2 :!S1]] ; combo q; keys
+    ]}
 
     {
         :des "Application Layer - Hold Q to trigger"
@@ -703,7 +723,7 @@
     ;;         :delayed {:invoked ["one-shot-shift-mode" 0] :canceled ["one-shot-shift-mode" 0]}}]]}
 
     {:des "symbols and numbers layer"
-        :rules [[:condi :spacebar-mode :!us-layout] ; hold spacebar to use the numbers and symbols layer only on colemak-dh keyboard layout
+        :rules [[:condi :spacebar-mode] ; hold spacebar to use the numbers and symbols layer only on colemak-dh keyboard layout
 
     ;; ! < > = ^   * 7 8 9 : ?
      ;; # [ ( ) ]   & 4 5 6 - + \
