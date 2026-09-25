@@ -1,0 +1,298 @@
+;; ============================================================
+;; Kanata configuration — Colemak DH (ANSI)
+;; Ported from Karabiner-Elements / Goku DSL
+;; ============================================================
+;;
+;; Cross-platform config for macOS and Windows.
+;; Default: macOS modifiers (Cmd for shortcuts).
+;; See "OS SELECTION" to switch to Windows (Ctrl).
+;;
+;; Layers:
+;;   1. colemak-dh  — Base typing (Colemak DH letter remap)
+;;   2. symbols     — Numbers & symbols (hold Space)
+;;   3. navigation  — Arrows, F-keys, home-row mods (hold A)
+;;   4. leader      — Code-snippet macros (hold Period)
+;;
+;; IMPORTANT: Set your OS keyboard layout to plain US QWERTY.
+;; Kanata intercepts at the hardware level and handles ALL
+;; letter remapping — a Colemak DH OS input source on top
+;; of this would double-remap keys.
+;; ============================================================
+
+
+;; ──────────────────────────────────────────────
+;; OS SELECTION — uncomment ONE defcfg block
+;; ──────────────────────────────────────────────
+
+;; ── macOS ─────────────────────────────────────
+(defcfg
+  process-unmapped-keys yes
+  concurrent-tap-hold yes
+  ;; danger-enable-cmd yes ;; uncomment to enable (cmd ...) app-launch actions
+)
+
+;; ── Windows ───────────────────────────────────
+;; (defcfg
+;;   process-unmapped-keys yes
+;;   concurrent-tap-hold yes
+;;   ;; windows-altgr cancel-lctl-press ;; uncomment if AltGr sends spurious Ctrl
+;; )
+
+
+;; ──────────────────────────────────────────────
+;; Timing
+;; ──────────────────────────────────────────────
+
+(defvar
+  tt  200   ;; tap timeout  (ms before a held key commits to "hold")
+  ht  200   ;; hold timeout (ms to activate hold action)
+  ct   50   ;; chord timeout (ms window for simultaneous-key combos)
+)
+
+
+;; ──────────────────────────────────────────────
+;; Physical source layout (QWERTY labels)
+;; ──────────────────────────────────────────────
+;; Standard ANSI — adjust if your board has extra keys (ISO,
+;; split, etc.) and mirror the change in every deflayer.
+
+(defsrc
+  grv  1    2    3    4    5    6    7    8    9    0    min  eql  bspc
+  tab  q    w    e    r    t    y    u    i    o    p    lbrc rbrc bksl
+  caps a    s    d    f    g    h    j    k    l    scln apo  ret
+  lsft z    x    c    v    b    n    m    comm .    /    rsft
+  lctl lalt lmet           spc            rmet ralt rctl
+)
+
+
+;; ──────────────────────────────────────────────
+;; Aliases
+;; ──────────────────────────────────────────────
+
+(defalias
+
+  ;; ── Tap-hold dual-role modifiers ───────────────────────
+
+  ;; Tab → Esc tap | Hyper (Ctrl+Alt+Cmd+Shift) hold
+  htab (tap-hold-press $tt $ht esc (multi lsft lctl lalt lmet))
+
+  ;; CapsLock → Tab tap | Ctrl+Alt hold
+  hcap (tap-hold-press $tt $ht tab (multi lctl lalt))
+
+  ;; Left Cmd → Enter tap | Left Cmd hold
+  lcmd (tap-hold-press $tt $ht ret lmet)
+
+  ;; Right Cmd → Delete Forward tap | Right Cmd hold
+  rcmd (tap-hold-press $tt $ht del rmet)
+
+  ;; Left Shift → [ tap | Left Shift hold
+  lshf (tap-hold-press $tt $ht lbrc lsft)
+
+  ;; Right Shift → ] tap | Right Shift hold
+  rshf (tap-hold-press $tt $ht rbrc rsft)
+
+  ;; ── Layer activators ───────────────────────────────────
+
+  ;; Space → Space tap | Symbols layer hold
+  sspc (tap-hold-press $tt $ht spc (layer-while-held symbols))
+
+  ;; A → a tap | Navigation layer hold
+  anav (tap-hold-press $tt $ht a (layer-while-held navigation))
+
+  ;; Period → . tap | Leader layer hold
+  pdot (tap-hold-press $tt $ht . (layer-while-held leader))
+
+  ;; ── Navigation layer: home-row mods ────────────────────
+  ;; Hold for modifier, tap for F-key.
+  ns (tap-hold-press $tt $ht f5 lalt)    ;; s → Alt / F5
+  nd (tap-hold-press $tt $ht f6 lsft)    ;; d → Shift / F6
+  nf (tap-hold-press $tt $ht f7 lmet)    ;; f → Cmd / F7 (Win key on Windows)
+  ng (tap-hold-press $tt $ht f8 lctl)    ;; g → Ctrl / F8
+
+  ;; ── Shortcut aliases ───────────────────────────────────
+  ;; macOS defaults (Cmd-based).  For Windows change lmet → lctl
+  ;; in every alias below, or swap M- to C- in shorthands.
+  undo  M-z
+  redo  M-S-z
+  cut   M-x
+  copy  M-c
+  paste M-v
+  pstpl M-S-A-v         ;; paste without formatting
+  selal M-a             ;; select all
+
+  ;; App / tab switching
+  aptab M-tab            ;; app switcher
+  aptbr M-S-tab          ;; reverse app switcher
+  ptab  M-S-lbrc         ;; prev tab  (Cmd+Shift+[)
+  ntab  C-tab            ;; next tab  (Ctrl+Tab)
+  nptab C-S-tab          ;; prev tab  (Ctrl+Shift+Tab)
+
+  ;; Show application windows (macOS Mission Control)
+  shwin M-A-down
+
+  ;; ── Leader-layer macros (period-hold + key) ────────────
+  ;; Outputs are literal QWERTY key events — the OS must be
+  ;; set to US QWERTY for these to produce the right characters.
+
+  ;; .+a → () => {   (JS arrow function)
+  arfn (macro S-9 S-0 spc eql S-. spc S-lbrc)
+
+  ;; .+s → function funcName() { ⏎ return  (selects "funcName")
+  exfn (macro f u n c t i o n spc f u n c S-n a m e S-9 S-0 spc S-lbrc ret r e t u r n up A-rght S-A-lft)
+
+  ;; .+b → ```⏎```  (fenced code block, cursor between fences)
+  cblk (macro grv grv grv ret grv grv grv up M-rght)
+
+  ;; .+f → - [ ]   (Markdown checkbox)
+  mbox (macro min spc lbrc spc rbrc spc)
+
+  ;; .+c → <div></div>  (cursor between tags)
+  htdv (macro S-comm d i v S-. S-comm / d i v S-. lft lft lft lft lft lft)
+
+  ;; .+g → <tag></tag>  (Cmd+D × 2 to multi-select both tag names)
+  httg (macro S-comm t a g S-. S-comm / t a g S-. lft lft lft lft lft lft lft M-d M-d)
+
+  ;; .+, → console.log()  (cursor inside parens)
+  clog (macro c o n s o l e . l o g S-9 S-0 lft)
+
+  ;; .+m → /** */  (JS block comment, cursor between)
+  bcmt (macro / S-8 S-8 spc S-8 / lft lft lft)
+
+  ;; ── Email macros (triggered by chords below) ──────────
+  ;; ⚠  Replace these with your own addresses.
+  eml1 (macro a r i c S-2 c o l l e g i u m b u i l t . c o m)
+  eml2 (macro a r i c S-2 h e l i x i r l a b s . c o m)
+  eml3 (macro a r i c S-2 a r i c c b . d e v)
+  eml4 (macro a r i c b o u w e r s S-2 o u t l o o k . c o m)
+)
+
+
+;; ──────────────────────────────────────────────
+;; Chords (simultaneous key combos)
+;; ──────────────────────────────────────────────
+;; Physical (defsrc) key positions. Fire on first key release
+;; within $ct ms. Active on all layers — combos that overlap
+;; with layer keys fire only when both keys are pressed
+;; simultaneously, not sequentially.
+
+(defchordsv2
+  ;; ── Editing (left hand) ──
+  (w e)        @undo   $ct first-release ()   ;; w+f(CDH) → Undo
+  (e r)        @redo   $ct first-release ()   ;; f+p(CDH) → Redo
+  (z x)        @cut    $ct first-release ()   ;; z+x → Cut
+  (x c)        @copy   $ct first-release ()   ;; x+c → Copy
+  (c v)        @paste  $ct first-release ()   ;; c+d(CDH) → Paste
+  (z b)        @pstpl  $ct first-release ()   ;; z+v(CDH) → Paste plain
+  (z c)        @selal  $ct first-release ()   ;; z+c → Select All
+
+  ;; ── Inline symbols (right hand / bottom row) ──
+  (i o)        min     $ct first-release ()   ;; u+y(CDH) → -
+  (k l)        eql     $ct first-release ()   ;; e+i(CDH) → =
+  (comm .)     S-min   $ct first-release ()   ;; ,+. → _
+  (. /)        S-/     $ct first-release ()   ;; .+/ → ?
+  (/ rsft)     S-1     $ct first-release ()   ;; /+RShift → !
+  (m comm)     S-apo   $ct first-release ()   ;; h+,(CDH) → "
+  (f g)        S-2     $ct first-release ()   ;; t+g(CDH) → @
+
+  ;; ── VS Code terminal (number row) ──
+  (9 0)        C-grv       $ct first-release ()   ;; 9+0 → toggle terminal
+  (8 9)        M-S-lbrc    $ct first-release ()   ;; 8+9 → prev terminal tab
+  (0 min)      M-S-rbrc    $ct first-release ()   ;; 0+- → next terminal tab
+  (8 9 0)      C-S-grv     $ct first-release ()   ;; 8+9+0 → new terminal
+
+  ;; ── Email combos ──
+  (h j)        @eml1  $ct first-release ()   ;; m+n(CDH) position
+  (m n)        @eml2  $ct first-release ()   ;; h+k(CDH) position
+  (y u)        @eml3  $ct first-release ()   ;; j+l(CDH) position
+  (t y)        @eml4  $ct first-release ()   ;; b+j(CDH) position
+)
+
+
+;; ══════════════════════════════════════════════
+;; LAYER 1 — Colemak DH (base)
+;; ══════════════════════════════════════════════
+;; Physical QWERTY keys remapped to Colemak DH output.
+;; Modifier keys carry tap-hold dual roles.
+;;
+;; Colemak DH (what each physical position produces):
+;;
+;;  q  w  f  p  b    j  l  u  y  ;
+;;  a  r  s  t  g    m  n  e  i  o
+;;  z  x  c  d  v    k  h  ,  .  /
+
+(deflayer colemak-dh
+  grv  1    2    3    4    5    6    7    8    9    0    min  eql  bspc
+  @htab q   w    f    p    b    j    l    u    y    scln lbrc rbrc bksl
+  @hcap @anav r   s    t    g    m    n    e    i    o    apo  ret
+  @lshf z    x    c    d    v    k    h    comm @pdot /    @rshf
+  lctl  lalt @lcmd          @sspc          @rcmd ralt rctl
+)
+
+
+;; ══════════════════════════════════════════════
+;; LAYER 2 — Symbols & Numbers (hold Space)
+;; ══════════════════════════════════════════════
+;; Colemak DH position → symbol produced:
+;;
+;;   `  !  <  >  =  ^    *  7  8  9  :  -  +
+;;   S⇥ #  [  (  )  ]    &  4  5  6  -  +  \
+;;   @  $  {  }  %  ~  | 1  2  3     *
+;;                           0  .
+
+(deflayer symbols
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  grv  S-1  S-comm S-.  eql  S-6 S-8 7    8    9   S-scln min S-eql _
+  S-tab S-3 lbrc S-9  S-0  rbrc S-7 4    5    6    min  S-eql _
+  _    S-2  S-4 S-lbrc S-rbrc S-5 S-grv S-bksl 1   2    3    S-8
+  _    _    _              _              0    .    _
+)
+
+
+;; ══════════════════════════════════════════════
+;; LAYER 3 — Navigation (hold A)
+;; ══════════════════════════════════════════════
+;; Right hand: arrow cluster, Home/End, PgUp/PgDn.
+;; Left hand home row: hold → modifier, tap → F-key.
+;; Left hand bottom/top: F1–F4, F9–F12.
+;;
+;; External modifiers pass through: hold Shift before
+;; pressing an arrow to select text, etc.
+;;
+;; Right-hand layout (Colemak DH positions):
+;;
+;;              ↑              Home    End
+;;          ←   ↓   →         AppSwitch  RevSwitch
+;;   PrevTab NextTab PrevTab  PgUp  ShowWin PgDn  |
+
+(deflayer navigation
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    f9   f10  f11  f12  _    home up   end  _    _    _    _
+  _    _    @ns  @nd  @nf  @ng  @nptab lft down rght @aptab @aptbr _
+  _    f1   f2   f3   f4   @ptab @ntab pgup @shwin pgdn S-bksl _
+  _    _    _              _              _    _    _
+)
+
+
+;; ══════════════════════════════════════════════
+;; LAYER 4 — Leader (hold Period)
+;; ══════════════════════════════════════════════
+;; Code-snippet macros. Hold period, then press:
+;;
+;;   a → () => {         (arrow function)
+;;   s → function …      (scaffold, selects name)
+;;   b → ``` code block
+;;   f → - [ ]           (Markdown checkbox)
+;;   c → <div></div>
+;;   g → <tag></tag>     (multi-cursor)
+;;   , → console.log()
+;;   m → /** */          (block comment)
+;;
+;; All unmapped keys fall through to the base layer.
+
+(deflayer leader
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    @arfn @exfn _  @mbox @httg _   _    _    _    _    _    _
+  _    _    _  @htdv  _  @cblk  _  @bcmt @clog _    _    _
+  _    _    _              _              _    _    _
+)
